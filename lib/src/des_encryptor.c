@@ -8,8 +8,26 @@
 
 /* ------ Internal service functions ------ */
 
-static void generateKeys(char key[DEFAULT_DES_KEY_BYTE_SIZE], char *generatedKeys) {
+static void generateKeys(const char key[DEFAULT_DES_KEY_BYTE_SIZE], char *generatedKeys) {
 
+    /* Variables */
+    long long unitedKey = 0;
+    long long temporalKey = 0;
+
+    /* Copying key bits */
+    unitedKey |= *(unsigned int *) key;                             /* Copy first 32 bits */
+    unitedKey |= ((long long) *(unsigned short *) (key + 4) << 31); /* Copy next 16 bits */
+    unitedKey |= ((long long) *(key + 6) << 47);                    /* Copy last 8 bits */
+
+    /* Initial permutation */
+    for (unsigned int i = 0; i < DEFAULT_DES_KEY_BIT_SIZE; i++) {
+
+        _bittest64(&unitedKey, i) ? _bittestandset64(&temporalKey, DES_KEY_INITIAL_PERMUTATION_TABLE[i])
+                                  : _bittestandreset64(&temporalKey, DES_KEY_INITIAL_PERMUTATION_TABLE[i]);
+    }
+
+    unitedKey = temporalKey;
+    temporalKey = 0;
 }
 
 static unsigned int mainEncryptionFunction(unsigned int highPart, char key[DES_ITERATION_KEY_BYTE_SIZE]) {
@@ -31,12 +49,13 @@ static void encryptBlock(long long block, char key[DEFAULT_DES_KEY_BYTE_SIZE]) {
 
     /* Initial permutation */
     for (unsigned int i = 0; i < DEFAULT_DES_BLOCK_BIT_SIZE; i++) {
+
         _bittest64(&block, i) ? _bittestandset64(&buffer, DES_INITIAL_PERMUTATION_TABLE[i])
                               : _bittestandreset64(&buffer, DES_INITIAL_PERMUTATION_TABLE[i]);
     }
 
     /* Keys generation */
-    generatedKeys(key, generatedKeys);
+    generateKeys(key, generatedKeys);
 
     /* Encrypting cycles */
     lowPart = *(unsigned int *) (&buffer);
@@ -49,7 +68,7 @@ static void encryptBlock(long long block, char key[DEFAULT_DES_KEY_BYTE_SIZE]) {
         temporalHighPart = lowPart ^ mainEncryptionFunction(highPart,
                                                             generatedKeys + (i * DES_ITERATION_KEY_BYTE_SIZE));
 
-        /* Final assignment */
+        /* Switch to next iteration */
         lowPart = temporalLowPart;
         highPart = temporalHighPart;
     }
