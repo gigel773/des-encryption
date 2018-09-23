@@ -4,9 +4,17 @@
 /* ------ Includes ------ */
 
 #include <stdlib.h>
-#include <des_tables.h>
-#include <immintrin.h>
+#include <definitions.h>
 
+#ifdef _MSC_VER
+
+#include <intrin.h>
+
+#else
+#include <immintrin.h>
+#include <psdk_inc/intrin-impl.h>
+
+#endif
 /* ------ Functions API ------ */
 
 /**

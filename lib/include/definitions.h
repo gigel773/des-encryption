@@ -4,16 +4,18 @@
 /* ------ Defines ------ */
 
 #define DEFAULT_DES_KEY_BYTE_SIZE 7
+#define DEFAULT_DES_KEY_BIT_SIZE 56
 #define DEFAULT_DES_BLOCK_BIT_SIZE 64
 #define DEFAULT_DES_EXTENDING_TABLE_SIZE 48
+#define DEFAULT_DES_FEISTEL_NUMBER_OF_CYCLES 16
 
 /* ------ Macros ------ */
 
 #define COPY_ARRAY(source, destination, numberOfElements) \
-    for (unsigned int i = 0; i < (numberOfElements); i++) (destination)[i] = (source)[i];
+    for (unsigned int index = 0; index < (numberOfElements); index++) (destination)[index] = (source)[index];
 
 #define FLUSH_ARRAY(array, size) \
-    for (unsigned int i = 0; i < (size); i++) (array)[i] = 0;
+    for (unsigned int index = 0; index < (size); index++) (array)[index] = 0;
 
 /* ------ Enums ------ */
 
@@ -27,8 +29,8 @@ typedef enum {
 struct DES_context {
     unsigned long long *source;
     unsigned long long *output;
-    unsigned int sourceSize;
-    char key[DEFAULT_DES_KEY_BYTE_SIZE];
+    unsigned int       sourceSize;
+    char               key[DEFAULT_DES_KEY_BYTE_SIZE];
 };
 
 #endif //OWNDES_DEFINITIONS_H
