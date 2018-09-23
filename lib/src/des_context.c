@@ -13,7 +13,7 @@ DES_status DES_createContext(struct DES_context *context,
     context->output = (unsigned long long *) malloc(sizeof(unsigned long long) * sourceSize);
 
     /* Simple assignment */
-    context->source = source;
+    context->source     = source;
     context->sourceSize = sourceSize;
     COPY_ARRAY(key, context->key, DEFAULT_DES_KEY_BYTE_SIZE)
 
@@ -26,7 +26,7 @@ DES_status DES_flushContext(struct DES_context *context) {
     free(context->output);
 
     /* Simple assignment */
-    context->output = NULL;
+    context->output     = NULL;
     context->sourceSize = 0;
     FLUSH_ARRAY(context->key, DEFAULT_DES_KEY_BYTE_SIZE)
 

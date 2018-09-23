@@ -29,8 +29,8 @@ typedef enum {
 struct DES_context {
     unsigned long long *source;
     unsigned long long *output;
-    unsigned int sourceSize;
-    char key[DEFAULT_DES_KEY_BYTE_SIZE];
+    unsigned int       sourceSize;
+    char               key[DEFAULT_DES_KEY_BYTE_SIZE];
 };
 
 #endif //OWNDES_DEFINITIONS_H
