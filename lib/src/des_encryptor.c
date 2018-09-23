@@ -54,7 +54,7 @@ static void generateKeys(const char key[DEFAULT_DES_KEY_BYTE_SIZE], char *genera
         }
 
         /* Writing results */
-        COPY_ARRAY((char *) &temporalKey, generatedKeys + DES_ITERATION_KEY_BYTE_SIZE * i, DES_ITERATION_KEY_BYTE_SIZE);
+        COPY_ARRAY((char *) &temporalKey, generatedKeys + i * DES_ITERATION_KEY_BYTE_SIZE, DES_ITERATION_KEY_BYTE_SIZE);
     }
 }
 
@@ -94,7 +94,7 @@ static void encryptBlock(long long block, char key[DEFAULT_DES_KEY_BYTE_SIZE]) {
         /* Main actions */
         temporalLowPart  = highPart;
         temporalHighPart = lowPart ^ feistelFunction(highPart,
-                                                     generatedKeys + (i * DES_ITERATION_KEY_BYTE_SIZE));
+                                                     generatedKeys + i * DES_ITERATION_KEY_BYTE_SIZE);
 
         /* Switch to next iteration */
         lowPart  = temporalLowPart;
