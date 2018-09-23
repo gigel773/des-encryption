@@ -1,7 +1,5 @@
 project(ownDesLibraryTests C)
 
-enable_testing()
-
 # Includes
 include_directories(include ../lib/include)
 
