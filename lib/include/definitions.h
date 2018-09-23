@@ -8,6 +8,7 @@
 #define DEFAULT_DES_BLOCK_BIT_SIZE 64
 #define DEFAULT_DES_EXTENDING_TABLE_SIZE 48
 #define DEFAULT_DES_FEISTEL_NUMBER_OF_CYCLES 16
+#define DEFAULT_DES_S_BOXES_NUMBER 8
 
 /* ------ Macros ------ */
 
@@ -23,6 +24,13 @@ typedef enum {
     SUCCESS,
     FAILURE
 } DES_status;
+
+typedef enum {
+    ZERO   = 0,
+    FIRST  = 1,
+    SECOND = 32,
+    THIRD  = 33
+} SBOX_rows;
 
 /* ------ Structures ------ */
 
