@@ -61,6 +61,18 @@ static void generateKeys(const char key[DEFAULT_DES_KEY_BYTE_SIZE], char *genera
 static unsigned int feistelFunction(unsigned int highPart, char *key) {
 
     /* Variables */
+    long long int extendedData = 0;
+
+    /* Extending */
+    for (unsigned int i = 0; i < DEFAULT_DES_EXTENDING_TABLE_SIZE; i++) {
+        if (_bittest((const long *) &highPart, (long) DES_EXTENDING_TABLE[i])) {
+            _bittestandset64(&extendedData, i);
+        }
+    }
+
+    /* S-blocks transform */
+
+    /* Permutation */
 
     return 0;
 }
