@@ -12,10 +12,10 @@
 /* ------ Macros ------ */
 
 #define COPY_ARRAY(source, destination, numberOfElements) \
-    for (unsigned int i = 0; i < (numberOfElements); i++) (destination)[i] = (source)[i];
+    for (unsigned int index = 0; index < (numberOfElements); index++) (destination)[index] = (source)[index];
 
 #define FLUSH_ARRAY(array, size) \
-    for (unsigned int i = 0; i < (size); i++) (array)[i] = 0;
+    for (unsigned int index = 0; index < (size); index++) (array)[index] = 0;
 
 /* ------ Enums ------ */
 

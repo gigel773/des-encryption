@@ -6,14 +6,19 @@
 /* ------ Defines ------ */
 
 #define DES_ITERATION_KEY_BYTE_SIZE 6
+#define FIRST_28_BITS_MASK 0xFFFFFFF
+#define SECOND_28_BITS_MASK 0xFFFFFFF0000000
 
 /* ------ Internal service functions ------ */
 
 static void generateKeys(const char key[DEFAULT_DES_KEY_BYTE_SIZE], char *generatedKeys) {
 
     /* Variables */
-    long long unitedKey   = 0;
-    long long temporalKey = 0;
+    long long    unitedKey   = 0;
+    long long    temporalKey = 0;
+    unsigned int keyLowPart  = 0;
+    unsigned int keyHighPart = 0;
+    unsigned int cyclicMask  = 0;
 
     /* Copying key bits */
     unitedKey |= *(unsigned int *) key;                               /* Copy first 32 bits */
@@ -27,8 +32,30 @@ static void generateKeys(const char key[DEFAULT_DES_KEY_BYTE_SIZE], char *genera
         }
     }
 
-    unitedKey   = temporalKey;
-    temporalKey = 0;
+    keyLowPart  = (unsigned int) (temporalKey & FIRST_28_BITS_MASK);
+    keyHighPart = (unsigned int) ((temporalKey & SECOND_28_BITS_MASK) >> 28u);
+
+    /* Main generation cycle */
+    for (unsigned int i = 0; i < DEFAULT_DES_FEISTEL_NUMBER_OF_CYCLES; i++) {
+
+        /* Cyclic shift */
+        cyclicMask  = ((1u << DES_KEY_SHIFT_TABLE[i]) - 1u) << (28u - DES_KEY_SHIFT_TABLE[i]);
+        keyLowPart  = ((keyLowPart << DES_KEY_SHIFT_TABLE[i]) & FIRST_28_BITS_MASK) | (keyLowPart & cyclicMask);
+        keyHighPart = ((keyHighPart << DES_KEY_SHIFT_TABLE[i]) & FIRST_28_BITS_MASK) | (keyHighPart & cyclicMask);
+
+        /* Extending permutation */
+        unitedKey   = (((long long) keyHighPart) << 28u) | (keyLowPart);
+        temporalKey = 0;
+
+        for (unsigned int j = 0; j < DEFAULT_DES_EXTENDING_TABLE_SIZE; j++) {
+            if (_bittest64(&unitedKey, DES_KEY_EXTENDING_PERMUTATION_TABLE[j])) {
+                _bittestandset64(&temporalKey, j);
+            }
+        }
+
+        /* Writing results */
+        COPY_ARRAY((char *) &temporalKey, generatedKeys + DES_ITERATION_KEY_BYTE_SIZE * i, DES_ITERATION_KEY_BYTE_SIZE);
+    }
 }
 
 static unsigned int feistelFunction(unsigned int highPart, char *key) {
