@@ -25,6 +25,13 @@ typedef enum {
     FAILURE
 } DES_status;
 
+typedef enum {
+    ZERO   = 0,
+    FIRST  = 1,
+    SECOND = 32,
+    THIRD  = 33
+} SBOX_rows;
+
 /* ------ Structures ------ */
 
 struct DES_context {
