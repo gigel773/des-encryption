@@ -10,11 +10,11 @@ DES_status DES_createContext(struct DES_context *context,
                              char key[DEFAULT_DES_KEY_BYTE_SIZE]) {
 
     /* Memory allocation */
-    context->output = (unsigned long long *) malloc(sizeof(unsigned long long) * sourceSize);
+    context->output = (unsigned long long *) malloc(sizeof(unsigned long long) * (sourceSize >> 3u));
 
     /* Simple assignment */
     context->source     = source;
-    context->sourceSize = sourceSize;
+    context->sourceSize = (sourceSize >> 3u);
     COPY_ARRAY(key, context->key, DEFAULT_DES_KEY_BYTE_SIZE)
 
     return SUCCESS;

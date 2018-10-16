@@ -57,7 +57,10 @@ static void generateKeys(const char key[DEFAULT_DES_KEY_BYTE_SIZE], char *genera
         }
 
         /* Writing results */
-        COPY_ARRAY((char *) &temporalKey, generatedKeys + i * DES_ITERATION_KEY_BYTE_SIZE, DES_ITERATION_KEY_BYTE_SIZE);
+        COPY_ARRAY((char *) &temporalKey,
+                   generatedKeys + index * DES_ITERATION_KEY_BYTE_SIZE,
+                   DES_ITERATION_KEY_BYTE_SIZE);
+
     }
 }
 
@@ -120,7 +123,7 @@ static unsigned int feistelFunction(unsigned int highPart, const char *key) {
     return result;
 }
 
-static void encryptBlock(long long block, char key[DEFAULT_DES_KEY_BYTE_SIZE]) {
+static void encryptBlock(long long block, char key[DEFAULT_DES_KEY_BYTE_SIZE], long long *output) {
 
     /* Variables */
     long long    buffer           = 0;
@@ -128,7 +131,7 @@ static void encryptBlock(long long block, char key[DEFAULT_DES_KEY_BYTE_SIZE]) {
     unsigned int highPart         = 0;
     unsigned int temporalLowPart  = 0;
     unsigned int temporalHighPart = 0;
-    char         *generatedKeys   = NULL;
+    char         generatedKeys[DEFAULT_DES_KEY_BYTE_SIZE * DEFAULT_DES_FEISTEL_NUMBER_OF_CYCLES];
 
     /* Initial permutation */
     for (unsigned int i = 0; i < DEFAULT_DES_BLOCK_BIT_SIZE; i++) {
@@ -157,7 +160,15 @@ static void encryptBlock(long long block, char key[DEFAULT_DES_KEY_BYTE_SIZE]) {
     }
 
     /* Final permutation */
+    buffer = 0;
+    buffer |= lowPart;
+    buffer |= highPart << 31u;
 
+    for (unsigned int i = 0; i < DEFAULT_DES_BLOCK_BIT_SIZE; i++) {
+        if (_bittest64(&buffer, DES_FINAL_PERMUTATION_TABLE[i])) {
+            _bittestandset64(output, i);
+        }
+    }
 }
 
 /* ------ Main functions implementation ------ */
@@ -168,7 +179,7 @@ DES_status DES_encrypt(struct DES_context *context) {
 
     /* Main cycle */
     for (unsigned int i = 0; i < context->sourceSize; i++) {
-        encryptBlock(context->source[i], context->key);
+        encryptBlock(context->source[i], context->key, (long long *) (context->output + i));
     }
 
     return SUCCESS;
