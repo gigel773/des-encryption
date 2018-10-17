@@ -1,6 +1,18 @@
 #ifndef OWNDES_DEFINITIONS_H
 #define OWNDES_DEFINITIONS_H
 
+/* ------ Includes ------ */
+#ifdef _MSC_VER
+
+#include <intrin.h>
+
+#else
+
+#include <immintrin.h>
+#include <psdk_inc/intrin-impl.h>
+
+#endif
+
 /* ------ Defines ------ */
 
 #define DEFAULT_DES_KEY_BYTE_SIZE 7
