@@ -15,7 +15,7 @@ DES_status DES_encrypt(struct DES_context *context) {
 
     /* Main cycle */
     for (unsigned int i = 0; i < context->sourceSize; i++) {
-        ownProcessBlock(context->source[i], context->key, (long long *) (context->output + i));
+        ownProcessBlock(context->source[i], generatedKeys, (long long *) (context->output + i));
     }
 
     return SUCCESS;

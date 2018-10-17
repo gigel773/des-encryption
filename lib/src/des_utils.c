@@ -127,6 +127,22 @@ void ownGenerateKeys(const char *key, char *generatedKeys) {
     }
 }
 
+void ownReverseGeneratedKeys(char *generatedKeys) {
+
+    /* Variables */
+    char         reversedKeys[DEFAULT_DES_KEY_BYTE_SIZE * DEFAULT_DES_FEISTEL_NUMBER_OF_CYCLES];
+    unsigned int counter = 0;
+
+    /* Complete temporal buffer */
+    for (unsigned int i = DEFAULT_DES_KEY_BYTE_SIZE * DEFAULT_DES_FEISTEL_NUMBER_OF_CYCLES - 7; i > 0; i -= 7) {
+        COPY_ARRAY(generatedKeys + i, reversedKeys + counter, 7)
+        counter += 7;
+    }
+
+    /* Copy reversed keys to the output */
+    COPY_ARRAY(reversedKeys, generatedKeys, DEFAULT_DES_KEY_BYTE_SIZE * DEFAULT_DES_FEISTEL_NUMBER_OF_CYCLES);
+}
+
 void ownProcessBlock(long long block, char *generatedKeys, long long *output) {
 
     /* Variables */

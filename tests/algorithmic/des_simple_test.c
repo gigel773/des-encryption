@@ -25,6 +25,7 @@ int main() {
     DES_createContext(&context, (unsigned long long int *) message, TEST_MESSAGE_BYTE_SIZE, key);
     DES_encrypt(&context);
     TEST_copy((char *) context.output, cipheredMessage, TEST_MESSAGE_BYTE_SIZE);
+    DES_inputToOutput(&context);
     DES_decrypt(&context);
     TEST_copy((char *) context.output, decipheredMessage, TEST_MESSAGE_BYTE_SIZE);
     DES_flushContext(&context);

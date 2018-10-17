@@ -30,6 +30,8 @@ DES_status DES_createContext(struct DES_context *context,
  */
 DES_status DES_flushContext(struct DES_context *context);
 
+DES_status DES_inputToOutput(struct DES_context *context);
+
 DES_status DES_encrypt(struct DES_context *context);
 
 DES_status DES_decrypt(struct DES_context *context);
