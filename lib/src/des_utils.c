@@ -5,7 +5,6 @@
 
 /* ------ Defines ------ */
 
-#define DES_ITERATION_KEY_BYTE_SIZE 6
 #define FIRST_28_BITS_MASK 0xFFFFFFF
 #define SECOND_28_BITS_MASK 0xFFFFFFF0000000
 #define NUMBER_OF_SIX_BIT_BLOCKS 8
@@ -121,8 +120,8 @@ void ownGenerateKeys(const char *key, char *generatedKeys) {
 
         /* Writing results */
         COPY_ARRAY((char *) &temporalKey,
-                   generatedKeys + i * DES_ITERATION_KEY_BYTE_SIZE,
-                   DES_ITERATION_KEY_BYTE_SIZE);
+                   generatedKeys + i * DEFAULT_DES_ITERATION_KEY_BYTE_SIZE,
+                   DEFAULT_DES_ITERATION_KEY_BYTE_SIZE);
 
     }
 }
@@ -134,23 +133,45 @@ void ownReverseGeneratedKeys(char *generatedKeys) {
     unsigned int counter = 0;
 
     /* Complete temporal buffer */
-    for (unsigned int i = DEFAULT_DES_KEY_BYTE_SIZE * DEFAULT_DES_FEISTEL_NUMBER_OF_CYCLES - 7; i > 0; i -= 7) {
-        COPY_ARRAY(generatedKeys + i, reversedKeys + counter, 7)
-        counter += 7;
+    for (unsigned int i = DEFAULT_DES_ITERATION_KEY_BYTE_SIZE * (DEFAULT_DES_FEISTEL_NUMBER_OF_CYCLES - 1);
+         i > 0;
+         i -= DEFAULT_DES_ITERATION_KEY_BYTE_SIZE) {
+        COPY_ARRAY(generatedKeys + i, reversedKeys + counter, DEFAULT_DES_ITERATION_KEY_BYTE_SIZE)
+        counter += DEFAULT_DES_ITERATION_KEY_BYTE_SIZE;
     }
 
     /* Copy reversed keys to the output */
-    COPY_ARRAY(reversedKeys, generatedKeys, DEFAULT_DES_KEY_BYTE_SIZE * DEFAULT_DES_FEISTEL_NUMBER_OF_CYCLES);
+    COPY_ARRAY(reversedKeys, generatedKeys, DEFAULT_DES_ITERATION_KEY_BYTE_SIZE * DEFAULT_DES_FEISTEL_NUMBER_OF_CYCLES);
 }
 
-void ownProcessBlock(long long block, char *generatedKeys, long long *output) {
+void ownEncryptionProcessor(unsigned int *lowPart, unsigned int *highPart, char *keys) {
+
+    /* Main actions */
+    unsigned int temporalLowPart  = *highPart;
+    unsigned int temporalHighPart = *lowPart ^feistelFunction(*highPart, keys);
+
+    /* Switch to next iteration */
+    *lowPart  = temporalLowPart;
+    *highPart = temporalHighPart;
+}
+
+void ownDecryptionProcessor(unsigned int *lowPart, unsigned int *highPart, char *keys) {
+
+    /* Main actions */
+    unsigned int temporalHighPart = *lowPart;
+    unsigned int temporalLowPart  = *highPart ^feistelFunction(*highPart, keys);
+
+    /* Switch to next iteration */
+    *lowPart  = temporalLowPart;
+    *highPart = temporalHighPart;
+}
+
+void ownProcessBlock(long long block, char *generatedKeys, long long *output, uucInplaceFunction coreProcessor) {
 
     /* Variables */
-    long long    buffer           = 0;
-    unsigned int lowPart          = 0;
-    unsigned int highPart         = 0;
-    unsigned int temporalLowPart  = 0;
-    unsigned int temporalHighPart = 0;
+    long long    buffer   = 0;
+    unsigned int lowPart  = 0;
+    unsigned int highPart = 0;
 
     /* Initial permutation */
     for (unsigned int i = 0; i < DEFAULT_DES_BLOCK_BIT_SIZE; i++) {
@@ -164,15 +185,7 @@ void ownProcessBlock(long long block, char *generatedKeys, long long *output) {
     highPart = *((unsigned int *) (&buffer) + 1);
 
     for (unsigned int i = 0; i < DEFAULT_DES_FEISTEL_NUMBER_OF_CYCLES; i++) {
-
-        /* Main actions */
-        temporalLowPart  = highPart;
-        temporalHighPart = lowPart ^ feistelFunction(highPart,
-                                                     generatedKeys + i * DES_ITERATION_KEY_BYTE_SIZE);
-
-        /* Switch to next iteration */
-        lowPart  = temporalLowPart;
-        highPart = temporalHighPart;
+        coreProcessor(&lowPart, &highPart, generatedKeys + i * DEFAULT_DES_ITERATION_KEY_BYTE_SIZE);
     }
 
     /* Final permutation */

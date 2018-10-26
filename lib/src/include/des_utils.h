@@ -7,6 +7,10 @@ void ownGenerateKeys(const char *key, char *generatedKeys);
 
 void ownReverseGeneratedKeys(char *generatedKeys);
 
-void ownProcessBlock(long long block, char *generatedKeys, long long *output);
+void ownEncryptionProcessor(unsigned int *lowPart, unsigned int *highPart, char *keys);
+
+void ownDecryptionProcessor(unsigned int *lowPart, unsigned int *highPart, char *keys);
+
+void ownProcessBlock(long long block, char *generatedKeys, long long *output, uucInplaceFunction coreProcessor);
 
 #endif //OWNDES_DES_UTILS_H

@@ -17,10 +17,15 @@
 
 #define DEFAULT_DES_KEY_BYTE_SIZE 7
 #define DEFAULT_DES_KEY_BIT_SIZE 56
+#define DEFAULT_DES_ITERATION_KEY_BYTE_SIZE 6
 #define DEFAULT_DES_BLOCK_BIT_SIZE 64
 #define DEFAULT_DES_EXTENDING_TABLE_SIZE 48
 #define DEFAULT_DES_FEISTEL_NUMBER_OF_CYCLES 16
 #define DEFAULT_DES_S_BOXES_NUMBER 8
+
+/* ------ Types ------ */
+
+typedef void (*uucInplaceFunction)(unsigned int *, unsigned int *, char *);
 
 /* ------ Macros ------ */
 
@@ -35,14 +40,14 @@
 typedef enum {
     SUCCESS,
     FAILURE
-} DES_status;
+}            DES_status;
 
 typedef enum {
     ZERO   = 0,
     FIRST  = 1,
     SECOND = 32,
     THIRD  = 33
-} SBOX_rows;
+}            SBOX_rows;
 
 /* ------ Structures ------ */
 
