@@ -15,7 +15,8 @@ int main() {
 
     /* Variables */
     char message[TEST_MESSAGE_BYTE_SIZE] = "aaaaaaaabbbbbbbb";
-    char *decipheredMessage              = (char *) malloc(sizeof(char) * TEST_MESSAGE_BYTE_SIZE);
+    char decipheredMessage[TEST_MESSAGE_BYTE_SIZE];
+    char cipheredMessage[TEST_MESSAGE_BYTE_SIZE];
     char key[DEFAULT_DES_KEY_BYTE_SIZE]  = "1234567";
 
     struct DES_context context;
@@ -23,12 +24,11 @@ int main() {
     /* Main test actions */
     DES_createContext(&context, (unsigned long long int *) message, TEST_MESSAGE_BYTE_SIZE, key);
     DES_encrypt(&context);
+    TEST_copy((char *) context.output, cipheredMessage, TEST_MESSAGE_BYTE_SIZE);
+    DES_inputToOutput(&context);
     DES_decrypt(&context);
-    TEST_copy((char *) context.output, decipheredMessage, context.sourceSize);
+    TEST_copy((char *) context.output, decipheredMessage, TEST_MESSAGE_BYTE_SIZE);
     DES_flushContext(&context);
-
-    /* Freeing memory */
-    free(decipheredMessage);
 
     /* Comparing results */
     return TEST_compareStrings(message, decipheredMessage, TEST_MESSAGE_BYTE_SIZE);

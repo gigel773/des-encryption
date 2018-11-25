@@ -6,15 +6,6 @@
 #include <stdlib.h>
 #include <definitions.h>
 
-#ifdef _MSC_VER
-
-#include <intrin.h>
-
-#else
-#include <immintrin.h>
-#include <psdk_inc/intrin-impl.h>
-
-#endif
 /* ------ Functions API ------ */
 
 /**
@@ -38,6 +29,8 @@ DES_status DES_createContext(struct DES_context *context,
  * @return @code SUCCESS @endcode if everything was alright and @code FAILURE @endcode in the opposite case
  */
 DES_status DES_flushContext(struct DES_context *context);
+
+DES_status DES_inputToOutput(struct DES_context *context);
 
 DES_status DES_encrypt(struct DES_context *context);
 
